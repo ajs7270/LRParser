@@ -62,7 +62,7 @@ private final Set<T> set = new HashSet<T>();
 }
 
 @Override public boolean isEmpty() {
-    return set.isEmpty();
+    return queue.isEmpty();
 }
 
 @Override public Iterator<T> iterator() {
