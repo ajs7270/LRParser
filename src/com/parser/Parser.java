@@ -9,6 +9,8 @@ import java.util.Queue;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
 
+import org.omg.CosNaming.IstringHelper;
+
 public class Parser {
 
 	public static void main(String[] args) {
@@ -20,7 +22,9 @@ public class Parser {
 
 		LinkedList<String> CFG = (LinkedList<String>) file.getRule();
 		
-		//<NonTerminal, nonterminal로 시작하는 Grammer List>를 담은 Hash table 생성 ClOSURE에서 이용
+		UniqueQueue<String> jisu = new UniqueQueue<String>();
+		
+		// <NonTerminal, nonterminal로 시작하는 Grammer List>  를 담은 Hash table 생성 ClOSURE에서 이용
 		HashMap<Character, LinkedList<String>> CFG_HashMap = new HashMap<Character, LinkedList<String>>();
 		Iterator<String> iter = CFG.iterator();
 		
@@ -39,33 +43,40 @@ public class Parser {
 			GrammerList.add(R);
 			CFG_HashMap.put(Nonterminal, GrammerList);
 		}
+		LinkedList<String> rule = new LinkedList<String>();
 		
 		
+		System.out.println(Parser.CLOSURE(rule, CFG_HashMap));
 	}
 
-	public List<String> CLOSURE(List<String> rule, HashMap<Character, LinkedList<String>> CFG) {
+	
+	/*
+	 * [S>E, E>E+T, E>T, T>T*F, T>F, F>(E), F>x]라는 CFG를 가질 때,
+	 * 
+	 * [S>E]가 들어오면
+	 * [S->.E, E->.E+T, E->.T, T->.T*F, T->.F, F->.(E), F->.x]인 Linked list로 반환해줌
+	 */
+	public static List<String> CLOSURE(LinkedList<String> rule, HashMap<Character, LinkedList<String>> CFG) {
 		Iterator<String> iter = rule.iterator();
-		List<String> result = new LinkedList<String>();
+		LinkedList<String> result = new LinkedList<String>();
 		Queue<String> queue = new UniqueQueue<String>();
 		String cfg = null; // CFG의 룰 하나를 의미
 		char markSymbol;
 		while(iter.hasNext()) {
-			queue.offer(iter.next());
-			while(!queue.isEmpty())
+			queue.add((String)iter.next());
+	
+			while(!queue.isEmpty()) {
+				
 				cfg = queue.poll();
 				
-				
 				// '.' 이 없는 경우 '.'을 추가해줌 
-				if(!cfg.contains(".")) {
-					StringBuffer cfgPlusDotSymbol = new StringBuffer();
-					cfgPlusDotSymbol.append(cfg);	
-					cfgPlusDotSymbol.insert(cfg.indexOf('>') + 1,".");
-					cfg = cfgPlusDotSymbol.toString();
-					
+				if(!cfg.contains(".")) {					
+					cfg = cfg.replace(">", "->.");
+	
 					//그리고 result에  넣어줌
 					result.add(cfg);
 					
-					// 만약  mark symbol 이 Nonterminal일 경우 Nontermianl들에 해당되는 rule을 큐에 넣어줌
+					// 만약  mark symbol 이 Nonterminal일 경우 Nonterminal들에 해당되는 rule을 큐에 넣어줌
 					markSymbol = cfg.charAt(cfg.indexOf('.') + 1);
 					if(Character.isUpperCase(markSymbol)) {
 						LinkedList<String> temp = CFG.get(markSymbol);
@@ -79,16 +90,20 @@ public class Parser {
 				// '.'이 있는경우 계속 .을 증가시켜 주면서 큐에 넣는다.
 				}else {			
 					
-					//'.'을 한칸 뒤로 보냄
+					//REDUCE '.'이 마지막에 찍혀있는 경우엔 큐에 넣지 않고 while문 반복
+					// 즉 '.'이 마지막이면 큐에 들어가지 않는다.
+					if(cfg.charAt('.') == cfg.length()-1 ) {
+						result.add(cfg);
+						continue;
+					}
 					
+					//'.'을 한칸 뒤로 보냄
+					int index = cfg.indexOf(".");
+					StringBuilder tempSub = new StringBuilder(cfg.substring(index, index+1));					
+					cfg = cfg.replace(tempSub.toString(),tempSub.reverse().toString());
 					
 					//결과로 넣어줌
 					result.add(cfg);
-					
-					//REDUCE '.'이 마지막에 찍혀있는 경우엔 큐에 넣지 않고 while문 반복
-					if(cfg.charAt('.') == cfg.length()-1 ) {
-						continue;
-					}
 					
 					// 만약 대문자로 시작한다면 대문자로 시작하는애 다 queue에 넣어줌
 					markSymbol = cfg.charAt(cfg.indexOf('.') + 1);
@@ -101,18 +116,13 @@ public class Parser {
 							queue.add(tempIter.next());
 						}	
 					}
-					
-					
-
-					
-					
 				}
-				
-		}
+			}
+		}	
 		return result;
 	}
 
-	public Boolean isTerminal(String rule) {
+	public static Boolean isTerminal(String rule) {
 
 		// '.'의 위치 확인
 		int head = rule.indexOf('.');
