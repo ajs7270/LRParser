@@ -25,9 +25,16 @@ public class Parser {
 		UniqueQueue<String> jisu = new UniqueQueue<String>();
 		
 		// <NonTerminal, nonterminal로 시작하는 Grammer List>  를 담은 Hash table 생성 ClOSURE에서 이용
-		HashMap<Character, LinkedList<String>> CFG_HashMap = new HashMap<Character, LinkedList<String>>();
-		Iterator<String> iter = CFG.iterator();
+		HashMap<Character, LinkedList<String>> CFG_HashMap = Parser.to_HashMap(CFG);
 		
+		LinkedList<String> rule = new LinkedList<String>();
+		System.out.println(Parser.CLOSURE(rule, CFG_HashMap));
+	}
+	
+	public static HashMap<Character, LinkedList<String>> to_HashMap(LinkedList<String> CFG){
+		Iterator<String> iter = CFG.iterator();
+		HashMap<Character, LinkedList<String>> CFG_HashMap = new HashMap<Character, LinkedList<String>>();
+
 		// CFG를 Hash Table에 담음
 		while(iter.hasNext()) {
 			String R = iter.next();
@@ -43,12 +50,9 @@ public class Parser {
 			GrammerList.add(R);
 			CFG_HashMap.put(Nonterminal, GrammerList);
 		}
-		LinkedList<String> rule = new LinkedList<String>();
-		
-		
-		System.out.println(Parser.CLOSURE(rule, CFG_HashMap));
-	}
+		return CFG_HashMap; 
 
+	}
 	
 	/*
 	 * [S>E, E>E+T, E>T, T>T*F, T>F, F>(E), F>x]라는 CFG를 가질 때,
@@ -122,22 +126,8 @@ public class Parser {
 		return result;
 	}
 
-	public static Boolean isTerminal(String rule) {
-
-		// '.'의 위치 확인
-		int head = rule.indexOf('.');
-
-		// '.'이 맨 마지막에 위치하지 않은 경우
-		if (head + 1 < rule.length()) {
-			// '.'다음이 대문자이면 non-terminal 이기 때문에 false return
-			if (Character.isUpperCase(rule.charAt(head + 1))) {
-				return false;
-			} else {
-				return true;
-			}
-		} else {
-			return true;
-		}
+	public static void GOTO() {
+		
 	}
 
 }
