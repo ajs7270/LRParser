@@ -31,7 +31,7 @@ public class Parser {
 		//I0을 만들기 위해 첫번째 식을 넣어준다.
 		rule.add(CFG.peek());
 		//I0을 넣어준다.
-		C0.add(Parser.CLOSURE(rule, CFG_HashMap));
+		C0.add(Parser.CLOSURE(rule));
 		//I1, I2, ...를만들어준다.
 		Parser.GOTO();
 		System.out.println(C0);
@@ -68,7 +68,7 @@ public class Parser {
 	 * [S>E]가 들어오면
 	 * [S->.E, E->.E+T, E->.T, T->.T*F, T->.F, F->.(E), F->.x]인 Linked list로 반환해줌
 	 */
-	public static LinkedList<String> CLOSURE(LinkedList<String> rule, HashMap<Character, LinkedList<String>> CFG) {
+	public static LinkedList<String> CLOSURE(LinkedList<String> rule) {
 		Iterator<String> iter = rule.iterator();
 		LinkedList<String> result = new LinkedList<String>();
 		Queue<String> queue = new UniqueQueue<String>();
@@ -88,10 +88,11 @@ public class Parser {
 					//그리고 result에  넣어줌
 					result.add(cfg);
 					
-					// 만약  mark symbol 이 Nonterminal일 경우 Nonterminal들에 해당되는 rule을 큐에 넣어줌
+					// 만약  mark symbol 이 Nonterminal일 경우 Nonterminal들에 해당되는 rule을 큐에 넣어줌 
+					// 지금 문제 2개 1.중복된걸 못 거름  2.iter가 제대로 동작 안함.
 					markSymbol = cfg.charAt(cfg.indexOf('.') + 1);
 					if(Character.isUpperCase(markSymbol)) {
-						LinkedList<String> temp = CFG.get(markSymbol);
+						LinkedList<String> temp = CFG_HashMap.get(markSymbol);
 						Iterator<String> tempIter = temp.iterator();
 						
 						while(tempIter.hasNext()) {
@@ -102,6 +103,16 @@ public class Parser {
 				// '.'이 있는경우 계속 .을 증가시켜 주면서 큐에 넣는다.
 				}else {			
 					
+					
+					//'.'을 한칸 뒤로 보냄
+					int index = cfg.indexOf(".");
+					StringBuilder tempSub = new StringBuilder(cfg.substring(index, index+2));		
+					
+					cfg = cfg.replace(tempSub.toString(),tempSub.reverse().toString());
+					//결과로 넣어줌
+					System.out.println(cfg);
+					result.add(cfg);
+					
 					//REDUCE '.'이 마지막에 찍혀있는 경우엔 큐에 넣지 않고 while문 반복
 					// 즉 '.'이 마지막이면 큐에 들어가지 않는다.
 					if(cfg.indexOf('.') == cfg.length()-1 ) {
@@ -109,23 +120,17 @@ public class Parser {
 						continue;
 					}
 					
-					//'.'을 한칸 뒤로 보냄
-					int index = cfg.indexOf(".");
-					StringBuilder tempSub = new StringBuilder(cfg.substring(index, index+1));					
-					cfg = cfg.replace(tempSub.toString(),tempSub.reverse().toString());
-					
-					//결과로 넣어줌
-					result.add(cfg);
-					
 					// 만약 대문자로 시작한다면 대문자로 시작하는애 다 queue에 넣어줌
 					markSymbol = cfg.charAt(cfg.indexOf('.') + 1);
 					if(Character.isUpperCase(markSymbol)) {
 												
-						LinkedList<String> temp = CFG.get(markSymbol);
+						LinkedList<String> temp = CFG_HashMap.get(markSymbol);
 						Iterator<String> tempIter = temp.iterator();
 						
 						while(tempIter.hasNext()) {
 							queue.add(tempIter.next());
+							System.out.println("queue");
+							System.out.println(queue.peek());
 						}	
 					}
 				}
@@ -149,12 +154,16 @@ public class Parser {
 		HashMap<Character, LinkedList<String>> Temp_CFG_HashMap;
 		 new HashMap<Character, LinkedList<String>>();
 		while(CIter.hasNext()) {
+			System.out.println(C0);
 			Temp_CFG_HashMap = Parser.to_HashMap(CIter.next());
 			HashIter = Temp_CFG_HashMap.keySet().iterator();
+
 			while(HashIter.hasNext()) {
-				LinkedList<String> result = Parser.CLOSURE(Temp_CFG_HashMap.get(HashIter.next()), CFG_HashMap);
+				LinkedList<String> result = Parser.CLOSURE(Temp_CFG_HashMap.get(HashIter.next()));
 				C0.add(result);
+				System.out.println(C0);
 			}
+			System.out.println(CIter.hasNext());
 		}
 
 	}
