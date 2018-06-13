@@ -17,7 +17,15 @@ import javax.swing.JFileChooser;
 public class FileIO {
 	List<String> inputData = new LinkedList<String>();
 	List<String> rule = new LinkedList<String>();
-
+	
+	public boolean isLoad() {
+		if(inputData.isEmpty()) {
+			return false;
+		}else {
+			return true;
+		}
+	}
+	
 	public void load() {
 
 		JFileChooser myFileChooser = new JFileChooser();

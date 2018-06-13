@@ -195,7 +195,6 @@ public class Parser {
 		while(CIter.hasNext()) {
 			// C0에 있는 CFG를 하나 꺼낸다.
 			LinkedList<String> curCFG = CIter.next();
-			System.out.println(C0);
 			// 점을 한칸 옮겨준다.
 			// 만약 점이 마지막에 있으면 어떡하지?
 			// 두가지 경우.
@@ -214,7 +213,6 @@ public class Parser {
 				curCFG = goNext(Temp_CFG_HashMap.get(HashIter.next()));
 				LinkedList<String> result = Parser.CLOSURE(curCFG);
 				C0.add(result);
-				System.out.println(C0);
 			}
 			
 			
