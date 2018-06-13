@@ -14,12 +14,11 @@ public class main {
 		Parser parser = new Parser(CFG);
 			
 		// <NonTerminal, nonterminal로 시작하는 Grammer List>  를 담은 Hash table 생성 ClOSURE에서 이용
-		
-		
 		LinkedList<String> rule = new LinkedList<String>();
 		
 		parser.GOTO();
 		System.out.println(parser.getC0());
+		file.save(parser.getC0());
 	}
 
 }

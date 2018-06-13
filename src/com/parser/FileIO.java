@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -82,6 +83,39 @@ public class FileIO {
 				ListIterator<String> it = (ListIterator<String>) this.inputData.listIterator();
 				StringBuilder sb = new StringBuilder();
 				while (it.hasNext()) {
+					sb.append(it.next());
+					sb.append("\r\n");
+				}
+				
+				// 파일에 저장
+				myWriter.write(sb.toString());
+				myWriter.close();
+
+			} catch (IOException ie) {
+				System.out.println(ie + "=> 입출력오류");
+			}
+		}
+	}
+	
+	public void save(LinkedHashSet<LinkedList<String>> C0) {
+		JFileChooser myFileChooser = new JFileChooser();
+		int intRet = myFileChooser.showSaveDialog(null);
+
+		if (intRet == JFileChooser.APPROVE_OPTION) {
+			try {
+				// FileChooser로 선택된 파일을 파일객체에 대입
+				java.io.File myFile = myFileChooser.getSelectedFile();
+
+				// 선택된 파일의 절대경로를 지정하여 PrintWriter 객체를 작성
+				PrintWriter myWriter = new PrintWriter(new BufferedWriter(new FileWriter(myFile.getAbsolutePath())));
+
+				// linkedList를 하나의 String으로 바꿈
+				Iterator<LinkedList<String>> it = C0.iterator();
+				StringBuilder sb = new StringBuilder();
+				int num = 0;
+				while (it.hasNext()) {
+					sb.append("I"+(num++)+"\r\n");
+					
 					sb.append(it.next());
 					sb.append("\r\n");
 				}

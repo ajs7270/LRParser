@@ -4,14 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
+
 import java.util.Queue;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
-
-import org.omg.CosNaming.IstringHelper;
-
-import com.sun.javafx.geom.transform.GeneralTransform3D;
 
 public class Parser {
 
@@ -24,7 +18,7 @@ public class Parser {
 		this.CFG = CFG;
 		setStart();
 		
-		this.CFG_HashMap = setHashMap(this.CFG);
+		Parser.CFG_HashMap = setHashMap(this.CFG);
 	
 		//I0을 넣어준다.
 		C0.add(this.CFG);
