@@ -18,13 +18,8 @@ public class main {
 		
 		LinkedList<String> rule = new LinkedList<String>();
 		
-		//I0을 만들기 위해 첫번째 식을 넣어준다.
-		rule.add(CFG.peek());
-		//I0을 넣어준다.
-		C0.add(Parser.CLOSURE(rule));
-		//I1, I2, ...를만들어준다.
-		Parser.GOTO();
-		System.out.println(C0);
+		parser.GOTO();
+		System.out.println(parser.getC0());
 	}
 
 }

@@ -23,12 +23,16 @@ public class Parser {
 		// TODO Auto-generated constructor stub
 		this.CFG = CFG;
 		setStart();
-		this.CFG_HashMap = setHashMap(CFG);
+		
+		this.CFG_HashMap = setHashMap(this.CFG);
 	
 		//I0을 넣어준다.
-		C0.add(CFG);
+		C0.add(this.CFG);
 	}
 	
+	public LinkedHashSet<LinkedList<String>> getC0(){
+		return C0;
+	}
 	/*
 	 * [S>E, E>E+T, E>T, T>T*F, T>F, F>(E), F>x]라는 CFG를 가질 때
 	 * [S->.E, E->.E+T, E->.T, T->.T*F, T->.F, F->.(E), F->.x] 로 바꿔줌 
@@ -67,16 +71,26 @@ public class Parser {
 			String rule = iter.next();
 			
 			int index = rule.indexOf(".");
-			StringBuilder tempSub = new StringBuilder(rule.substring(index, index+2));			
 			
-			 result.add(rule.replace(tempSub.toString(),tempSub.reverse().toString()));
+			//점이 마지막에 없을때 바꿔줌
+			if(canGoNext(rule)) {
+				StringBuilder tempSub = new StringBuilder(rule.substring(index, index+2));							
+				result.add(rule.replace(tempSub.toString(),tempSub.reverse().toString()));
+			}else {
+				result.add(rule);				
+			}		
 		}
 		return result;
 	}
 	
-	// markSimbol이 terminal인지 알려줌
+	// markSymbol이 terminal인지 알려줌
 	public static boolean markisTermianl(String rule) {
-		char markSymbol = getMark(rule);
+		char markSymbol;
+		// .이 맨 끝에 있을경우 끝남으로 terminal을 리턴
+		if(!canGoNext(rule))
+			return true;
+		
+		markSymbol = getMark(rule);
 		if(Character.isUpperCase(markSymbol))
 			return false;
 		else
@@ -182,28 +196,40 @@ public class Parser {
 		// markSymbol에 따라 Hashmap으로 만든다음
 		// 그 HashMap을 markSymbol에 따라 하나씩 꺼내가며 CLOSURE를 해주며
 		// 그 결과값들은 C0에 저장한다. 
+	
+		int i = 0; 
 		while(CIter.hasNext()) {
 			// C0에 있는 CFG를 하나 꺼낸다.
 			LinkedList<String> curCFG = CIter.next();
-			
+			System.out.println(C0);
 			// 점을 한칸 옮겨준다.
 			// 만약 점이 마지막에 있으면 어떡하지?
 			// 두가지 경우.
-			// 1. 점이 마지막에 있는 curCFG를 없게 만들어준다. (v) 선택
+			// 1. 점이 마지막에 있는 curCFG를 없게 만들어준다. 
 			// 그럼 점이 마지막에 있는 CFG를 HashMap을 만들때 없애주면 되겠다. 
-			// 2. 점이 마지막에 있을경우 따로 처리해준다.
-			curCFG = goNext(curCFG);
+			// 2. 점이 마지막에 있을경우 따로 처리해준다. (v) 선택
 			
-			// markSymbol에 따라서 HashMap으로 만들어준다.
+			//일단 현재 mark Symbol을 바탕  Hash map을 만들어주고 
 			Temp_CFG_HashMap = Mark_Hash(curCFG);
 			HashIter = Temp_CFG_HashMap.keySet().iterator();
+			curCFG = goNext(curCFG);
+			
 
 			while(HashIter.hasNext()) {
-				LinkedList<String> result = Parser.CLOSURE(Temp_CFG_HashMap.get(HashIter.next()));
+				//한칸 뒤로 이동
+				curCFG = goNext(Temp_CFG_HashMap.get(HashIter.next()));
+				LinkedList<String> result = Parser.CLOSURE(curCFG);
 				C0.add(result);
 				System.out.println(C0);
 			}
-			System.out.println(CIter.hasNext());
+			
+			
+			//이터레이터가 제대로 안돌아서 야매로 바꿈
+			i++;
+			CIter = C0.iterator();
+			for(int j = 0;j < i; j++) {
+				CIter.next();
+			}
 		}
 
 	}
